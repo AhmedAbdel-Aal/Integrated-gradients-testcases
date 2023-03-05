@@ -1,3 +1,7 @@
+"""
+This file contains methods from https://github.com/ankurtaly/Integrated-Gradients/tree/627ff162e9992ce551cb8079089f3e97fac790a3
+the methods are adapted.
+"""
 import numpy as np
 import torch
 

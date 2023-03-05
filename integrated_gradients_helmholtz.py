@@ -1,3 +1,8 @@
+"""
+This file contains methods from https://github.com/theislab/feature-attribution-sc
+the methods are adapted.
+"""
+
 import torch
 def batch_to_dict_scanvi(batch):
     return dict(x=batch["X"], batch_index=batch["batch"])
