@@ -80,6 +80,8 @@ def integrated_gradients(
   scaled_inputs = [baseline + (float(i)/steps)*(inp-baseline) for i in range(0, steps+1)]
   grads, _ = predictions_and_gradients(model, scaled_inputs, target_label_index)  # shapes: <steps+1>, <steps+1, inp.shape>
   grads = torch.stack(grads)
+  grads = grads.squeeze(2)
+  print('grads', grads.shape)
   # Use trapezoidal rule to approximate the integral.
   # See Section 4 of the following paper for an accuracy comparison between
   # left, right, and trapezoidal IG approximations:
@@ -92,12 +94,16 @@ def integrated_gradients(
   return integrated_gradients
 
 def get_gradients_func(model, inputs, target_label_index):
-    gradients = []
+    all_gradients = []
     predictions = []
     for input in inputs:
-        prediction = model(input)
-        target_output = prediction[0][target_label_index]
-        predictions.append(target_output)
-        gradients.append(torch.autograd.grad(target_output, input)[0])
-    
-    return gradients, predictions
+        gradients = []
+        for single_ex in input:
+            single_ex = single_ex.unsqueeze(0)
+            prediction = model(single_ex)            
+            target_output = prediction[0][target_label_index]
+            predictions.append(target_output)
+            gradients.append(torch.autograd.grad(target_output, single_ex)[0])
+        gradients = torch.stack(gradients)
+        all_gradients.append(gradients)
+    return all_gradients, predictions
